@@ -98,6 +98,13 @@ public class PersonalProfileRequestTO extends RequestTO {
 	public void setBirthdate(LocalDate birthdate) {
 		this.birthdate = birthdate;
 	}
+
+	@Override
+	public String toString() {
+		return "PersonalProfileRequestTO [requestURI=" + requestURI + ", restMethodType=" + restMethodType
+				+ ", personIdNumber=" + personIdNumber + ", fname=" + fname + ", lname=" + lname + ", birthdate="
+				+ birthdate + "]";
+	}
 	
 	
 
