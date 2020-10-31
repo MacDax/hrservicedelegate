@@ -1,6 +1,9 @@
 package com.springb.hrservice.hrservicedelegate;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -8,6 +11,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.springb.framework.common.core.CommonContextDynamic;
 import com.springb.framework.common.core.ProtocolHandler;
 import com.springb.framework.common.core.RESTHttpProtocolHandler;
@@ -27,11 +35,25 @@ public class PersonalProfileRequestBuilder extends RequestBuilder<PersonalProfil
 		if(null == requestTO) {
 			return null;
 		}
-		JSONObject hrPersonRequestJson = new JSONObject();
-		hrPersonRequestJson.put("id", requestTO.getPersonIdNumber());
+		//JSONObject hrPersonRequestJson = new JSONObject();
+		ObjectMapper mapper = new ObjectMapper();
+		//JsonNode rootNode = mapper.readTree(requestTO);
+		JavaTimeModule javaTimeModule = new JavaTimeModule();
+		javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+		mapper.registerModule(javaTimeModule);
+		String hrPersonRequestJson = null;
+		List<Person> personData = requestTO.getPersonData();
+		try {
+			hrPersonRequestJson = mapper.writeValueAsString(personData);
+		} catch (JsonProcessingException e) {
+			LOGGER.info("Json parse exception" + e.getMessage());
+			e.printStackTrace();
+		}
+		
+		/*hrPersonRequestJson.put("id", requestTO.getPersonIdNumber());
 		hrPersonRequestJson.put("fname", requestTO.getFname());
 		hrPersonRequestJson.put("lname", requestTO.getLname());
-		hrPersonRequestJson.put("birthdate", requestTO.getBirthdate());
+		hrPersonRequestJson.put("birthdate", requestTO.getBirthdate());*/
 		return hrPersonRequestJson;
 	}
 	
@@ -42,8 +64,8 @@ public class PersonalProfileRequestBuilder extends RequestBuilder<PersonalProfil
 	}
 	
 	@Override
-	public Map getAdditionalRequestDetails(PersonalProfileRequestTO requestTO, String protocolName) {
-		Map<Object, Object> requestMap = new HashMap();
+	public Map<?, ?> getAdditionalRequestDetails(PersonalProfileRequestTO requestTO, String protocolName) {
+		Map<Object, Object> requestMap = new HashMap<Object, Object>();
 		requestMap.put(RESTHttpProtocolHandler.REST_PROTOCOL_DATA_ELEMENTS.URI, requestTO.getRequestURI());
 		if(null != requestTO.getRestMethodType()) {
 			requestMap.put(ProtocolHandler.PROTOCOL_DATA_ELEMENTS.HEADER, requestTO.getRestMethodType());

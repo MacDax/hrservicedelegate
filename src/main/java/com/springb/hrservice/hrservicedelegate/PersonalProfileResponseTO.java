@@ -10,6 +10,9 @@ import com.springb.framework.common.core.ResponseTO;
 public class PersonalProfileResponseTO extends ResponseTO {
 	@JsonProperty("persons")
 	private List<HRPersonalProfile> personalProfileList;
+	@JsonProperty("status")
+	private String status;
+	//private List<ErrorMessages> errorMessages;
 
 	@Override
 	public String toString() {
@@ -24,4 +27,13 @@ public class PersonalProfileResponseTO extends ResponseTO {
 		this.personalProfileList = personalProfileList;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	
 }
